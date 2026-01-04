@@ -5,7 +5,7 @@ export default function TailwindBuilderPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-black p-4 md:p-8 flex flex-col items-center justify-center font-inter selection:bg-indigo-500 selection:text-white">
       {/* Background Effects */}
-      <div className="absolute inset-0 -z-10 h-full w-full bg-white dark:bg-black bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
+      <div className="absolute inset-0 -z-10 h-full w-full bg-white dark:bg-black bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-size-[14px_24px]">
         <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-indigo-500 opacity-20 blur-[100px]"></div>
       </div>
 
@@ -32,7 +32,7 @@ export default function TailwindBuilderPage() {
         </div>
 
         <header className="mb-10 text-center relative z-10">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 mb-4 animate-gradient-x">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500 mb-4 animate-gradient-x">
             Tailwind CSS Builder
           </h1>
           <p className="text-zinc-600 dark:text-zinc-400 max-w-lg mx-auto text-lg">
