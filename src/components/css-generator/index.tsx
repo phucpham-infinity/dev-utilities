@@ -1,6 +1,8 @@
-import { useCssGenerator } from '@/hooks/useCssGenerator';
-import InputSection from './css-generator/InputSection';
-import OutputSection from './css-generator/OutputSection';
+"use client";
+
+import { useCssGenerator } from "@/hooks/useCssGenerator";
+import InputSection from "./InputSection";
+import OutputSection from "./OutputSection";
 
 const CssGenerator = () => {
   const {
@@ -21,16 +23,19 @@ const CssGenerator = () => {
     includePreflight,
     setIncludePreflight,
     customConfig,
-    setCustomConfig
+    setCustomConfig,
   } = useCssGenerator();
 
   return (
     <div className="w-full max-w-8xl mx-auto bg-white dark:bg-zinc-900 rounded-xl shadow-lg overflow-hidden border border-zinc-200 dark:border-zinc-800">
       <div className="p-6 md:p-8">
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">CSS Generator for Tailwind</h2>
+          <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">
+            CSS Generator for Tailwind
+          </h2>
           <p className="text-zinc-600 dark:text-zinc-400">
-            Enter your HTML snippet to extract Tailwind classes and generate the corresponding CSS file.
+            Enter your HTML snippet to extract Tailwind classes and generate the
+            corresponding CSS file.
           </p>
         </div>
 

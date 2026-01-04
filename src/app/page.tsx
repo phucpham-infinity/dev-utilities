@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
-const Home = () => {
+export default function Home() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -16,7 +16,7 @@ const Home = () => {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {/* Tool Card: Tailwind CSS Builder */}
           <Link
-            to="/builder"
+            href="/builder"
             className="group relative bg-white dark:bg-zinc-900 rounded-2xl shadow-sm hover:shadow-xl border border-zinc-200 dark:border-zinc-800 p-6 transition-all duration-300 transform hover:-translate-y-1"
           >
             <div className="absolute top-6 right-6 text-zinc-200 dark:text-zinc-800 group-hover:text-cyan-500/20 transition-colors">
@@ -109,6 +109,4 @@ const Home = () => {
       </div>
     </div>
   );
-};
-
-export default Home;
+}
