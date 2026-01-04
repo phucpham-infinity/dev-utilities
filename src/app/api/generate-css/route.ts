@@ -68,8 +68,6 @@ export async function POST(request: Request) {
       from: undefined, // no file
     });
 
-    console.log('/api/generate-css',result);
-
     let finalCss = result.css;
 
     // Manually prepend Preflight if requested
