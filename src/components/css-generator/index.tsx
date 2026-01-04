@@ -1,8 +1,8 @@
 "use client";
 
-import { useCssGenerator } from "@/hooks/useCssGenerator";
-import InputSection from "./InputSection";
-import OutputSection from "./OutputSection";
+import { useCssGenerator } from "@/hooks/use-css-generator";
+import InputSection from "./input-section";
+import OutputSection from "./output-section";
 
 const CssGenerator = () => {
   const {
