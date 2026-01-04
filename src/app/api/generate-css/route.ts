@@ -2,10 +2,64 @@ import { NextResponse } from 'next/server';
 import postcss from 'postcss';
 import tailwindcss from 'tailwindcss-v3';
 import postcssCustomProperties from 'postcss-custom-properties';
-
 import autoprefixer from 'autoprefixer';
-
 import { preflightCss } from '@/lib/preflight-css';
+import * as cheerio from 'cheerio';
+
+// Helper function to prefix class names robustly
+const prefixClasses = (html: string, prefix: string) => {
+  if (!html || !prefix) return html;
+
+  const $ = cheerio.load(html, { 
+    xmlMode: false, // HTML mode
+    decodeEntities: false // Preserve entities
+  });
+
+  // Select any element with a class attribute
+  $('[class]').each((_, el) => {
+    const $el = $(el);
+    const classes = $el.attr('class')?.split(/\s+/) || [];
+    
+    const newClasses = classes.map(cls => {
+        if (!cls.trim()) return '';
+        
+        // Handle arbitrary values with colons inside [] or () - basic check
+        const parts = cls.split(':');
+        const utility = parts.pop(); // Get the last part
+        
+        if (!utility) return cls;
+
+        let prefixedUtility = '';
+        // Handle negative values e.g. -m-4 -> -{prefix}m-4
+        if (utility.startsWith('-')) {
+            prefixedUtility = `-${prefix}${utility.substring(1)}`;
+        } else {
+            prefixedUtility = `${prefix}${utility}`;
+        }
+
+        // Reconstruct logic
+        if (parts.length > 0) {
+            return `${parts.join(':')}:${prefixedUtility}`;
+        }
+        return prefixedUtility;
+    }).join(' ');
+
+    $el.attr('class', newClasses);
+  });
+
+  // Return only the body content if it was wrapped automatically, 
+  // or the full html if the user provided a full document.
+  // Cheerio behaves differently based on input.
+  // If input starts with <div... it might wrap.
+  
+  // A simple heuristic: if input has <html> or <body, return full $.html()
+  // else return $('body').html() || $.html();
+  
+  if (html.includes('<html') || html.includes('<body')) {
+      return $.html();
+  }
+  return $('body').html() || $.html();
+};
 
 export async function POST(request: Request) {
   try {
@@ -15,9 +69,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'HTML input is required' }, { status: 400 });
     }
 
+    // Process HTML Prefixing Server-Side
+    const prefixedHtml = prefix ? prefixClasses(html, prefix) : html;
+
+    // Use the *prefixed* HTML to generate CSS?
+    // Tailwind needs to see the classes as they appear in the HTML to generate styles for them.
+    // IF we send `prefixedHtml` and `config.prefix = prefix` -> Tailwind will look for `prefix-utility` in HTML.
+    // AND it will generate `.prefix-utility`.
+    // Correct.
+    
+    // Prepare Tailwind Config
+
     // Prepare Tailwind Config
     let config: any = {
-      content: [{ raw: html, extension: 'html' }],
+      content: [{ raw: prefixedHtml, extension: 'html' }],
       theme: {},
       plugins: [],
       corePlugins: {
@@ -26,10 +91,12 @@ export async function POST(request: Request) {
         preflight: false, 
       },
     };
-
+    
+    // Set prefix if provided
     if (prefix) {
       config.prefix = prefix;
     }
+
 
     // Merge custom config if provided
     if (customConfig && customConfig.trim()) {
@@ -44,7 +111,9 @@ export async function POST(request: Request) {
             ...(parsedConfig.corePlugins || {}),
             preflight: false, // Ensure it stays false
           },
-          prefix: prefix || parsedConfig.prefix, 
+          // We MUST set the prefix in config so Tailwind recognizes the classes we manually prefixed in the HTML content.
+          // Example: HTML has "tw-p-4". Config has prefix "tw-". Tailwind matches these and generates ".tw-p-4".
+          prefix: prefix || parsedConfig.prefix,
         };
       } catch (e) {
         return NextResponse.json({ error: 'Invalid JSON configuration' }, { status: 400 });
@@ -95,7 +164,10 @@ export async function POST(request: Request) {
     // might still rely on some base variables if not cleaned up properly or if used in animations.
     // However, the above removal targets the global reset blocks.
 
-    return NextResponse.json({ css: finalCss });
+    return NextResponse.json({ 
+        css: finalCss,
+        prefixedHtml: prefixedHtml 
+    });
 
   } catch (error: any) {
     console.error('CSS Generation Error:', error);
